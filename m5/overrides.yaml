@@ -1,0 +1,83 @@
+# Vault Helm Chart Value Overrides
+global:  
+  enabled: true  
+  tlsDisable: false
+
+server:
+
+  readinessProbe:
+    enabled: true
+    path: "/v1/sys/health?standbyok=true&sealedcode=204&uninitcode=204"
+  livenessProbe:
+    enabled: true
+    path: "/v1/sys/health?standbyok=true"
+    initialDelaySeconds: 60
+
+  extraEnvironmentVars:
+    VAULT_CACERT: /vault/userconfig/vault-server-tls/vault.ca
+
+  extraVolumes:
+    - type: secret
+      name: vault-server-tls 
+
+  service:
+    type: LoadBalancer
+    annotations:
+      service.beta.kubernetes.io/azure-dns-label-name=SERVER_DNS_LABEL
+  
+  ha:
+    enabled: true
+    replicas: 3
+    raft:
+      enabled: true
+      setNodeId: true
+
+      config: |
+        ui = true
+        listener "tcp" {
+          address = "[::]:8200"
+          cluster_address = "[::]:8201"
+          tls_cert_file = "/vault/userconfig/vault-server-tls/server.crt"
+          tls_key_file = "/vault/userconfig/vault-server-tls/server.key"
+          tls_ca_cert_file = "/vault/userconfig/vault-server-tls/ca.crt"        
+        }
+
+        storage "raft" {
+          path = "/vault/data"            
+            retry_join {          
+            leader_api_addr = "https://vault-0.vault-internal:8200"            
+            leader_ca_cert_file = "/vault/userconfig/vault-server-tls/ca.crt"            
+            leader_client_cert_file = "/vault/userconfig/vault-server-tls/server.crt"            
+            leader_client_key_file = "/vault/userconfig/vault-server-tls/server.key"          
+            }          
+            retry_join {            
+            leader_api_addr = "https://vault-1.vault-internal:8200"            
+            leader_ca_cert_file = "/vault/userconfig/vault-server-tls/ca.crt"            
+            leader_client_cert_file = "/vault/userconfig/vault-server-tls/server.crt"            
+            leader_client_key_file = "/vault/userconfig/vault-server-tls/server.key"          
+            }          
+            retry_join {            
+            leader_api_addr = "https://vault-2.vault-internal:8200"            
+            leader_ca_cert_file = "/vault/userconfig/vault-server-tls/ca.crt"           
+            leader_client_cert_file = "/vault/userconfig/vault-server-tls/server.crt"            
+            leader_client_key_file = "/vault/userconfig/vault-server-tls/server.key"          
+            }
+
+            autopilot {            
+              cleanup_dead_servers = "true"            
+              last_contact_threshold = "200ms"            
+              last_contact_failure_threshold = "10m"            
+              max_trailing_logs = 250000            
+              min_quorum = 3            
+              server_stabilization_time = "10s"          
+            }
+        }
+
+        service_registration "kubernetes" {}
+
+# Vault UI
+ui:
+  enabled: true
+  serviceType: LoadBalancer
+  annotations:
+    service.beta.kubernetes.io/azure-dns-label-name=UI_DNS_LABEL
