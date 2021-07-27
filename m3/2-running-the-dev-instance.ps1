@@ -3,7 +3,8 @@
 vault server -dev -dev-root-token-id=86753098675309
 
 # Open a second terminal window
-export VAULT_ADDR='http://127.0.0.1:8200'
+# PowerShell
+$env:VAULT_ADDR = "http://127.0.0.1:8200"
 
 # Try the CLI
 # List out the secrets engines
@@ -15,12 +16,15 @@ vault kv put secret/hg2g life=42
 # List out the auth methods
 vault auth list
 
-# Try the UI
+# Try the UI by going to http://127.0.0.1:8200
 
-# Try the API - we will use curl
+# Try the API - we will use Invoke-WebRequest
 # Set the root token
-export VAULT_TOKEN=86753098675309
+$env:VAULT_TOKEN="86753098675309"
 
-curl -H "X-Vault-Token: $VAULT_TOKEN" \
-  -X GET \
-  $VAULT_ADDR/v1/secret/data/hg2g | jq
+$headers = @{
+    "X-Vault-Token" = $env:VAULT_TOKEN
+}
+
+$resp = Invoke-WebRequest -Uri "$env:VAULT_ADDR/v1/secret/data/hg2g" `
+  -UseBasicParsing -Headers $headers 
