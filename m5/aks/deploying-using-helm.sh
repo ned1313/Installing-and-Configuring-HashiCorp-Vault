@@ -22,7 +22,7 @@ SECRET_NAME=vault-server-tls
 openssl genrsa -out vault.key 2048
 
 # Create a CSR for K8s
-cat <<EOF >${TMPDIR}/csr.conf
+cat <<EOF >csr.conf
 [req]
 req_extensions = v3_req
 distinguished_name = req_distinguished_name
@@ -49,11 +49,12 @@ openssl req -new -key vault.key \
 
 export CSR_NAME=vault-csr
 cat <<EOF > csr.yaml
-apiVersion: certificates.k8s.io/v1beta1
+apiVersion: certificates.k8s.io/v1
 kind: CertificateSigningRequest
 metadata:
   name: ${CSR_NAME}
 spec:
+  signerName: kubernetes.io/kubelet-serving
   groups:
   - system:authenticated
   request: $(cat server.csr | base64 | tr -d '\n')
