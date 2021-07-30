@@ -51,6 +51,7 @@ storage "raft" {
   node_id = "$instance_name"
   retry_join {
     leader_tls_servername = "${leader_tls_servername}"
+    leader_api_addr = "https://${leader_tls_servername}:8200"
     leader_ca_cert_file = "/opt/vault/tls/vault-ca.pem"
     leader_client_cert_file = "/opt/vault/tls/vault-cert.pem"
     leader_client_key_file = "/opt/vault/tls/vault-key.pem"
