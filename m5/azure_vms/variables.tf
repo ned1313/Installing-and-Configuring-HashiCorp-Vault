@@ -61,7 +61,7 @@ locals {
 
   vault_asg = "vault-asg-${random_id.id.hex}"
 
-  vault_vm = "controller-${random_id.id.hex}"
+  vault_vm = "vault-${random_id.id.hex}"
 
   vault_user_id = "vault-userid-${random_id.id.hex}"
 
