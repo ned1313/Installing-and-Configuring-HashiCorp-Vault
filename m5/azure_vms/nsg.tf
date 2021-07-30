@@ -56,6 +56,20 @@ resource "azurerm_network_security_rule" "vault_8201" {
   network_security_group_name                = azurerm_network_security_group.vault_net.name
 }
 
+resource "azurerm_network_security_rule" "vault_ssh" {
+  name                                       = "allow_ssh"
+  priority                                   = 120
+  direction                                  = "Inbound"
+  access                                     = "Allow"
+  protocol                                   = "Tcp"
+  source_port_range                          = "*"
+  destination_port_range                     = "22"
+  source_address_prefix                      = "${data.http.my_ip.body}/32" # Restrict to your public IP address
+  destination_application_security_group_ids = [azurerm_application_security_group.vault_asg.id]
+  resource_group_name                        = azurerm_resource_group.vault.name
+  network_security_group_name                = azurerm_network_security_group.vault_net.name
+}
+
 # Inbound rules for vault nic nsg
 
 resource "azurerm_network_security_rule" "vault_nic_8200" {
@@ -81,6 +95,20 @@ resource "azurerm_network_security_rule" "vault_nic_8201" {
   source_port_range                          = "*"
   destination_port_range                     = "8201"
   source_application_security_group_ids      = [azurerm_application_security_group.vault_asg.id]
+  destination_application_security_group_ids = [azurerm_application_security_group.vault_asg.id]
+  resource_group_name                        = azurerm_resource_group.vault.name
+  network_security_group_name                = azurerm_network_security_group.vault_nics.name
+}
+
+resource "azurerm_network_security_rule" "vault_nic_ssh" {
+  name                                       = "allow_ssh"
+  priority                                   = 120
+  direction                                  = "Inbound"
+  access                                     = "Allow"
+  protocol                                   = "Tcp"
+  source_port_range                          = "*"
+  destination_port_range                     = "22"
+  source_address_prefix                      = "${data.http.my_ip.body}/32" # Restrict to your public IP address
   destination_application_security_group_ids = [azurerm_application_security_group.vault_asg.id]
   resource_group_name                        = azurerm_resource_group.vault.name
   network_security_group_name                = azurerm_network_security_group.vault_nics.name
