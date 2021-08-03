@@ -31,4 +31,4 @@ override.tf.json
 # Don't include any certificate files
 *.pem
 *.pfx
-
+*.asc
