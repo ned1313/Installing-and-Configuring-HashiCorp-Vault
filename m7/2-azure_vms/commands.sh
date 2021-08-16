@@ -1,6 +1,8 @@
 # First we are going to initialize the Terraform config
 terraform init
 
+# Next we'll copy over the certificate file we'll use for the deployment
+cp ../../m5/1-cert-gen/vm-certificate-to-import.pfx vm-certificate-to-import.pfx
 # Next we are going to plan our deployment
 # Make sure to change the YOUR_CERTIFICATE_CN to the fqdn on
 # your TLS certificate.
