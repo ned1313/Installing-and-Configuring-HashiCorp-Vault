@@ -1,5 +1,5 @@
-# We are going to set up our local instance of the Vault executable to 
-# initialize and unseal the Vault server using PGP keys from our admins!
+# We are going to initialize and unseal the Vault server 
+# using PGP keys from our admins!
 
 #Install GnuPG and rng-tools
 sudo apt install gnupg rng-tools -y
@@ -17,15 +17,13 @@ gpg --export vaultadmin1 | base64 > vaultadmin1.asc
 gpg --export vaultadmin2 | base64 > vaultadmin2.asc
 gpg --export vaultadmin3 | base64 > vaultadmin3.asc
 
-#Now we can update the seal with our gpg keys
-export VAULT_ADDR="https://vault-test.globomantics.xyz:8200"
+#Now we can initialize the seal with our gpg keys
+export VAULT_ADDR="https://YOUR_VAULT_FQDN:8200"
 vault operator init -key-shares=3 -key-threshold=2 -pgp-keys="vaultadmin1.asc,vaultadmin2.asc,vaultadmin3.asc"
-vault operator rekey -nonce NONCE_VALUE
 
 #Copy out the key values to key_shares.txt
 
-#Now seal the vault and unseal using the new key shares
-vault operator seal
+# Next up, we are going to unseal our Vault server
 
 #Decrypt the first two keys
 echo "FIRST_KEY" | base64 --decode | gpg -u vaultadmin1 -dq
@@ -33,8 +31,3 @@ echo "SECOND_KEY" | base64 --decode | gpg -u vaultadmin2 -dq
 
 #Unseal the vault
 vault operator unseal
-
-#Clean up the keys
-gpg --delete-secret-and-public-key vaultadmin1
-gpg --delete-secret-and-public-key vaultadmin2
-gpg --delete-secret-and-public-key vaultadmin3

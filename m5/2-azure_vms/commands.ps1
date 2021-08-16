@@ -10,7 +10,7 @@ terraform init
 # Next we are going to plan our deployment
 # Make sure to change the YOUR_CERTIFICATE_CN to the fqdn on
 # your TLS certificate. Ex. vault-vms.globomantics.xyz
-certificate_cn=YOUR_CERTIFICATE_CN
+$certificate_cn="YOUR_CERTIFICATE_CN"
 
 terraform plan -var leader_tls_servername=$certificate_cn -out azurevm.tfplan
 

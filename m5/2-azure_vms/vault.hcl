@@ -20,8 +20,8 @@ storage "raft" {
   path    = "/opt/vault/data"
   node_id = "vault-0"
   retry_join {
-    leader_tls_servername = "${leader_tls_servername}"
-    leader_api_addr = "https://${leader_tls_servername}:8200"
+    leader_tls_servername = "LEADER_TLS_SERVERNAME"
+    leader_api_addr = "https://LEADER_TLS_SERVERNAME:8200"
     leader_ca_cert_file = "/opt/vault/tls/vault-ca.pem"
     leader_client_cert_file = "/opt/vault/tls/vault-cert.pem"
     leader_client_key_file = "/opt/vault/tls/vault-key.pem"
@@ -30,5 +30,5 @@ storage "raft" {
 
 # HA parameters
 
-cluster_addr = "https://$local_ipv4:8201"
-api_addr = "https://$local_ipv4:8200"
+cluster_addr = "https://LOCAL_IPV4:8201"
+api_addr = "https://LOCAL_IPV4:8200"

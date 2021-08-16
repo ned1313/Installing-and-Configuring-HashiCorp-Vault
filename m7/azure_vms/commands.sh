@@ -19,15 +19,4 @@ cp azure_vms_private_key.pem ~/.ssh/
 ssh azureuser@20.72.185.118 -p 2022 -i ~/.ssh/azure_vms_private_key.pem
 
 # Once you're connected we'll initialize the Vault server and raft cluster
-# First we have to ignore the TLS cert validation since it won't match what we have
-# And set some other environment variables
-sudo -i
-export VAULT_SKIP_VERIFY=true
-export VAULT_ADDR="https://127.0.0.1:8200"
-export VAULT_CACERT="/opt/vault/tls/vault-ca.pem"
-export VAULT_CLIENT_CERT="/opt/vault/tls/vault-cert.pem"
-export VAULT_CLIENT_KEY="/opt/vault/tls/vault-key.pem"
-
-# Now we'll initialize Vault. Note the recovery keys that are returned
-# Don't lose those!
-vault operator init
+# 

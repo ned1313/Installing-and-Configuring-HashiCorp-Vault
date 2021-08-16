@@ -35,7 +35,7 @@ variable "vault_vm_count" {
 variable "cert_pfx_file_path" {
   type        = string
   description = "The full path to the pfx file to be used for Vault"
-  default     = "../cert-gen/vm-certificate-to-import.pfx"
+  default     = "../1-cert-gen/vm-certificate-to-import.pfx"
 }
 
 variable "leader_tls_servername" {
