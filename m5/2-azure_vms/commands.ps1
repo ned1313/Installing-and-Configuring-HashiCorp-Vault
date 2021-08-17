@@ -57,7 +57,7 @@ sudo systemctl start vault
 journalctl -u vault
 
 # Assuming the Vault service is running, let's check the status
-export VAULT_ADDR="https://YOUR_VAULT_FQDN:8200"
+$env:VAULT_ADDR="https://YOUR_VAULT_FQDN:8200"
 
 vault status
 

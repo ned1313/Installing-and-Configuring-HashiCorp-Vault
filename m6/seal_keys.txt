@@ -1,2 +1,7 @@
+Paste the Unseal keys and initial root token here:
 
 
+Unseal key decrypted 1: 
+Unseal key decrypted 2: 
+
+New Root Token: 

@@ -13,7 +13,7 @@ cd ../../m5/2-azure_vms/
 cp auto_unseal_key.txt auto_unseal_key.tf
 
 # Now we can run a Terraform plan and apply with the same values as before
-certificate_cn=YOUR_CERTIFICATE_CN
+$certificate_cn="YOUR_CERTIFICATE_CN"
 
 terraform plan -var leader_tls_servername=$certificate_cn -out azurevm.tfplan
 
@@ -32,9 +32,6 @@ sudo vi /etc/vault.d/vault.hcl
 # Now we will restart Vault to seal it and update the loaded config
 # then unseal with the migrate flag
 sudo systemctl restart vault
-
-# Head back to the m6 directory
-cd ../../m6/1-azure-vms/
 
 # We're going to need our GPG keys to complete the operation
 # Decrypt the first two keys if you don't have them anymore
