@@ -3,6 +3,10 @@ cluster_name = "vault-vms"
 log_level = "Info"
 ui = true
 
+# HA parameters
+cluster_addr = "https://LOCAL_IPV4:8201"
+api_addr = "https://LOCAL_IPV4:8200"
+
 # Listener configuration
 listener "tcp" {
  # Listener address
@@ -16,6 +20,7 @@ listener "tcp" {
  tls_min_version = "tls12"
 }
 
+# Storage configuration
 storage "raft" {
   path    = "/opt/vault/data"
   node_id = "vault-0"
@@ -27,8 +32,3 @@ storage "raft" {
     leader_client_key_file = "/opt/vault/tls/vault-key.pem"
   }
 }
-
-# HA parameters
-
-cluster_addr = "https://LOCAL_IPV4:8201"
-api_addr = "https://LOCAL_IPV4:8200"

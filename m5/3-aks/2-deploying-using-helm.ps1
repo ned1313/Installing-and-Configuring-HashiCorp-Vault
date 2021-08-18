@@ -16,11 +16,7 @@ openssl pkcs12 -cacerts -nokeys -in ../1-cert-gen/aks-certificate-to-import.pfx 
 openssl pkcs12 -nokeys -in ../1-cert-gen/aks-certificate-to-import.pfx -passin pass: -out vault.crt
 openssl pkcs12 -nocerts -nodes -in ../1-cert-gen/aks-certificate-to-import.pfx -passin pass: | openssl pkcs8 -nocrypt -out vault.key
 
-kubectl create secret generic $SECRET_NAME \
-  --namespace $NAMESPACE \
-  --from-file=vault.key=vault.key \
-  --from-file=vault.crt=vault.crt \
-  --from-file=vault.ca=vault.ca
+kubectl create secret generic $SECRET_NAME --namespace $NAMESPACE --from-file=vault.key=vault.key --from-file=vault.crt=vault.crt --from-file=vault.ca=vault.ca
 
 # Clean up
 rm vault.*
@@ -29,9 +25,7 @@ rm vault.*
 helm install consul hashicorp/consul --namespace $NAMESPACE
 
 # Deploy Vault cluster to K8s using helm
-helm install vault hashicorp/vault \
-  --namespace $NAMESPACE \
-  --values overrides.yaml
+helm install vault hashicorp/vault --namespace $NAMESPACE --values overrides.yaml
 
 # We can monitor the install by doing a watch on the namespace
 kubectl get pods -n $NAMESPACE -w
@@ -47,3 +41,5 @@ kubectl get service vault -n $NAMESPACE
 # Ex. vault-aks.globomantics.xyz
 
 $env:VAULT_ADDR="https://$($certificate_cn):8200"
+
+vault status

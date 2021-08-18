@@ -43,4 +43,4 @@ server:
   service:
     type: LoadBalancer
     annotations: |
-      "service.beta.kubernetes.io/azure-dns-label-name": "vault-f9f8a7a6"
+      "service.beta.kubernetes.io/azure-dns-label-name": "CLUSTER_NAME"

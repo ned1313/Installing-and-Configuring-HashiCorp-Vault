@@ -47,3 +47,5 @@ kubectl get service vault -n vault
 # Ex. vault-aks.globomantics.xyz
 
 export VAULT_ADDR="https://${certificate_cn}:8200"
+
+vault status
