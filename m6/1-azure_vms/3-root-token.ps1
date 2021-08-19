@@ -26,3 +26,8 @@ echo "ENCRYPTED_TOKEN" | base64 --decode | gpg -u vaultadmin1 -dq
 
 # Try to log in with the new token
 vault login
+
+# Rotate the encryption key
+vault operator key-status
+
+vault operator rotate
