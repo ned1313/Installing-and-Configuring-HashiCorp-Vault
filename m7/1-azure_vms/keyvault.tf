@@ -116,9 +116,4 @@ resource "azurerm_key_vault_certificate" "vault" {
   }
 }
 
-resource "azurerm_key_vault_secret" "vault" {
-  key_vault_id = azurerm_key_vault_access_policy.vault.key_vault_id
-  name         = "${local.resource_group_name}-vault-vm-tls"
-  value        = filebase64(var.cert_pfx_file_path)
-}
 

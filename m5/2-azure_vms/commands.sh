@@ -24,6 +24,7 @@ terraform apply azurevm.tfplan
 # First we'll need to copy the SSH private key over to your home directory
 # This should apply the proper permissions to the private key to make SSH happy
 cp azure_vms_private_key.pem ~/.ssh/
+chmod 600 ~/.ssh/azure_vms_private_key.pem
 
 # Now we'll connect to the Vault server using SSH to install Vault
 ssh -i ~/.ssh/azure_vms_private_key.pem azureuser@PUBLIC_IP_ADDRESS

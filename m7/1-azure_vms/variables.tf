@@ -35,7 +35,7 @@ variable "vault_vm_count" {
 variable "cert_pfx_file_path" {
   type        = string
   description = "The full path to the pfx file to be used for Vault"
-  default     = "../cert-gen/certificate-to-import.pfx"
+  default     = "vm-certificate-to-import.pfx"
 }
 
 variable "leader_tls_servername" {
@@ -46,7 +46,7 @@ variable "leader_tls_servername" {
 variable "vault_version" {
   type        = string
   description = "The version of the Vault binary to download."
-  default     = "1.7.3"
+  default     = "1.8.0"
 }
 resource "random_id" "id" {
   byte_length = 4

@@ -29,9 +29,9 @@ pip3 install --user 'azure-cli~=2.26.0' 'azure-mgmt-core~=1.2.0' 'cryptography~=
 rm -rf /opt/vault/tls/*
 
 # set up the certificates
-touch /opt/vault/tls/{vault-cert.pem,vault-ca.pem,vault-key.pem}
-chown vault:vault /opt/vault/tls/{vault-cert.pem,vault-ca.pem,vault-key.pem}
-chmod 0640 /opt/vault/tls/{vault-cert.pem,vault-ca.pem,vault-key.pem}
+touch /opt/vault/tls/{vault-cert.pem,vault-ca.pem,vault-key.pem,vault-full.pem}
+chown vault:vault /opt/vault/tls/{vault-cert.pem,vault-ca.pem,vault-key.pem,vault-full.pem}
+chmod 0640 /opt/vault/tls/{vault-cert.pem,vault-ca.pem,vault-key.pem,vault-full.pem}
 
 secret_result=$(~/.local/bin/az keyvault secret show --id "${key_vault_secret_id}" --query "value" --output tsv)
 
@@ -41,10 +41,30 @@ echo $secret_result | base64 -d | openssl pkcs12 -cacerts -nokeys -chain -passin
 
 echo $secret_result | base64 -d | openssl pkcs12 -nocerts -nodes -passin pass: | openssl pkcs8 -nocrypt -out /opt/vault/tls/vault-key.pem
 
+echo $secret_result | base64 -d | openssl pkcs12 -nokeys -passin pass: -out /opt/vault/tls/vault-full.pem
+
 # Create config file
 
 cat <<EOF > /etc/vault.d/vault.hcl
+# General parameters
+cluster_name = "vault-vms"
+log_level = "Info"
 ui = true
+
+# HA parameters
+cluster_addr = "https://$local_ipv4:8201"
+api_addr = "https://${leader_tls_servername}:8200"
+
+listener "tcp" {
+ address     = "0.0.0.0:8200"
+ cluster_address = "0.0.0.0:8201"
+
+ tls_disable = 0
+ tls_cert_file      = "/opt/vault/tls/vault-full.pem"
+ tls_key_file       = "/opt/vault/tls/vault-key.pem"
+ tls_client_ca_file = "/opt/vault/tls/vault-ca.pem"
+ tls_min_version = "tls12"
+}
 
 storage "raft" {
   path    = "/opt/vault/data"
@@ -56,17 +76,6 @@ storage "raft" {
     leader_client_cert_file = "/opt/vault/tls/vault-cert.pem"
     leader_client_key_file = "/opt/vault/tls/vault-key.pem"
   }
-}
-
-cluster_addr = "https://$local_ipv4:8201"
-api_addr = "https://$local_ipv4:8200"
-
-listener "tcp" {
- address     = "0.0.0.0:8200"
- tls_disable = 0
- tls_cert_file      = "/opt/vault/tls/vault-cert.pem"
- tls_key_file       = "/opt/vault/tls/vault-key.pem"
- tls_client_ca_file = "/opt/vault/tls/vault-ca.pem"
 }
 
 seal "azurekeyvault" {

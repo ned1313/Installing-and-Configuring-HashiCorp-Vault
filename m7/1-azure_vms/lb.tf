@@ -43,7 +43,7 @@ resource "azurerm_lb_probe" "vault_8200" {
   name                = "port-8200"
   protocol            = "Https"
   port                = 8200
-  request_path        = "/v1/sys/health?activecode=200&standbycode=200&sealedcode=200&uninitcode=200"
+  request_path        = "/v1/sys/health?activecode=200&standbycode=429&sealedcode=200&uninitcode=200"
 }
 
 # Add LB rule for vault

@@ -103,7 +103,7 @@ resource "azurerm_linux_virtual_machine" "vault" {
       leader_tls_servername = var.leader_tls_servername
       key_vault_name        = local.key_vault_name
       key_vault_key_name    = azurerm_key_vault_key.autounseal.name
-      key_vault_secret_id   = azurerm_key_vault_secret.vault.id
+      key_vault_secret_id   = azurerm_key_vault_certificate.vault.secret_id
     })
   )
 }
