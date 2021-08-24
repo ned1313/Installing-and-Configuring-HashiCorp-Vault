@@ -1,0 +1,35 @@
+variable "oms_agent_version" {
+  type = string
+  description = "Version of OMS Linux Agent to install"
+  default = "1.13"
+}
+
+resource "azurerm_log_analytics_workspace" "vault" {
+  name                = local.vault_vm
+  location            = azurerm_resource_group.vault.location
+  resource_group_name = azurerm_resource_group.vault.name
+  sku                 = "PerGB2018"
+  retention_in_days   = 30
+}
+
+resource "azurerm_virtual_machine_extension" "tfazmon_ext" {
+  count = var.vault_vm_count
+  name                 = "OmsAgentForLinux-${count.index}"
+  virtual_machine_id   = azurerm_virtual_machine.vault[count.index].id
+  publisher            = "Microsoft.EnterpriseCloud.Monitoring"
+  type                 = "OmsAgentForLinux"
+  type_handler_version = var.oms_agent_version
+  auto_upgrade_minor_version = true
+
+  settings = <<SETTINGS
+    {
+        "workspaceId": "${azurerm_log_analytics_workspace.vault.workspace_id}"
+    }
+SETTINGS
+
+    protected_settings = <<PROTECTEDSETTINGS
+    {
+        "workspaceKey": "${azurerm_log_analytics_workspace.vault.primary_shared_key}"
+    }
+PROTECTEDSETTINGS
+}
