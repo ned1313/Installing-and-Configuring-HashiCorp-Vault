@@ -23,6 +23,7 @@ terraform apply azurevm.tfplan
 cp azure_vms_private_key.pem ~/.ssh/azure_vms_private_key2.pem
 chmod 600 ~/.ssh/azure_vms_private_key2.pem
 
+ssh -i ~/.ssh/azure_vms_private_key2.pem -p 2022 azureuser@PUBLIC_IP_ADDRESS
 
 # Once you're connected we'll initialize the Vault server and raft cluster using the UI
 

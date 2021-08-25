@@ -22,4 +22,4 @@ vault policy list
 
 # Things look good! Let's revoke the current root token 
 # and use the admin account from here on out
-vault token revoke s.lTiyARrCtkILBpMpJROhS418
+vault token revoke ROOT_TOKEN

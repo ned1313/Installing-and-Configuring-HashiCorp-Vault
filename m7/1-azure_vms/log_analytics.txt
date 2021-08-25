@@ -15,7 +15,7 @@ resource "azurerm_log_analytics_workspace" "vault" {
 resource "azurerm_virtual_machine_extension" "tfazmon_ext" {
   count = var.vault_vm_count
   name                 = "OmsAgentForLinux-${count.index}"
-  virtual_machine_id   = azurerm_virtual_machine.vault[count.index].id
+  virtual_machine_id   = azurerm_linux_virtual_machine.vault[count.index].id
   publisher            = "Microsoft.EnterpriseCloud.Monitoring"
   type                 = "OmsAgentForLinux"
   type_handler_version = var.oms_agent_version
