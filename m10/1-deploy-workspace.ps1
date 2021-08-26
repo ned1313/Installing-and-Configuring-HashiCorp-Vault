@@ -29,3 +29,6 @@ sudo cat /etc/rsyslog.d/95-omsagent.conf
 
 # Restart agent if desired
 sudo /opt/microsoft/omsagent/bin/service_control restart
+
+# And the wa-agent as well
+sudo systemctl restart walinuxagent
