@@ -54,7 +54,7 @@ resource "azurerm_key_vault_access_policy" "you" {
   key_vault_id = azurerm_key_vault.vault.id
 
   tenant_id = data.azurerm_client_config.current.tenant_id
-  object_id = data.azurerm_client_config.current.object_id
+  object_id = data.azuread_client_config.current.object_id
 
   key_permissions = [
     "get", "list", "update", "create", "decrypt", "encrypt", "unwrapKey", "wrapKey", "verify", "sign", "delete", "purge",
