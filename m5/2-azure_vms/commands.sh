@@ -49,6 +49,7 @@ sudo rm /etc/vault.d/vault.hcl
 ip a show eth0
 
 sudo vi /etc/vault.d/vault.hcl
+# copy the content from vault.hcl into the file, just double check the ip address before, however this has beden automated in my version of vaul.tpl
 
 # Now we can enable the vault service and start it
 sudo systemctl enable vault

@@ -109,8 +109,9 @@ resource "azurerm_linux_virtual_machine" "vault" {
   #Custom data from the vault.tmpl file
   custom_data = base64encode(
     templatefile("${path.module}/vault.tpl", {
-      vault_version       = var.vault_version
-      key_vault_secret_id = azurerm_key_vault_certificate.vault.secret_id
+      vault_version         = var.vault_version,
+      key_vault_secret_id   = azurerm_key_vault_certificate.vault.secret_id,
+      leader_tls_servername = var.leader_tls_servername
     })
   )
 }

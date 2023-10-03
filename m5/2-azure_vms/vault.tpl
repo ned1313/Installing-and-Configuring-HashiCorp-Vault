@@ -8,6 +8,7 @@ set -e -o pipefail
 # Get the instance name and local ipv4 address
 export instance_name="$(curl -sH Metadata:true --noproxy '*' 'http://169.254.169.254/metadata/instance/compute/name?api-version=2020-09-01&format=text')"
 export local_ipv4="$(curl -sH Metadata:true --noproxy '*' 'http://169.254.169.254/metadata/instance/network/interface/0/ipv4/ipAddress/0/privateIpAddress?api-version=2020-09-01&format=text')"
+export vault_fqdn="${leader_tls_servername}"
 
 # Get the Vault binary
 curl -fsSL https://apt.releases.hashicorp.com/gpg | sudo apt-key add -
@@ -16,7 +17,9 @@ sudo apt-get update
 sudo apt-get install python3-pip vault=${vault_version} -y
 
 # Install Azure CLI
-pip3 install --user 'azure-cli~=2.26.0' 'azure-mgmt-core~=1.2.0' 'cryptography~=3.3.2' 'urllib3[secure]~=1.26.5' 'requests~=2.25.1'
+
+python3 -m pip install --upgrade pip && pip3 install --user 'j2cli' 'azure-cli~=2.26.0' 'azure-mgmt-core~=1.2.0' 'cryptography~=3.3.2' 'urllib3[secure]~=1.26.5' 'requests~=2.25.1'
+export PATH=$PATH:~/.local/bin
 
 # configuring Azure CLI for use with VM managed identity
 ~/.local/bin/az login --identity --allow-no-subscriptions
@@ -39,5 +42,52 @@ echo $secret_result | base64 -d | openssl pkcs12 -nocerts -nodes -passin pass: |
 
 echo $secret_result | base64 -d | openssl pkcs12 -nokeys -passin pass: -out /opt/vault/tls/vault-full.pem
 
+echo "local_ipv4 is : $local_ipv4 and vault_fqdn is : $vault_fqdn" 
+# Create vault hcl file template and render it with jinja2
+cat >> /tmp/vault.hcl.j2 << EOF
+# General parameters
+cluster_name = "vault-vms"
+log_level = "Info"
+ui = true
+
+# HA parameters
+cluster_addr = "https://{{ local_ipv4 }}:8201"
+api_addr = "https://{{ local_ipv4 }}:8200"
+
+# Listener configuration
+listener "tcp" {
+ # Listener address
+ address     = "0.0.0.0:8200"
+
+ # TLS settings
+ tls_disable = 0
+ tls_cert_file      = "/opt/vault/tls/vault-full.pem"
+ tls_key_file       = "/opt/vault/tls/vault-key.pem"
+ tls_client_ca_file = "/opt/vault/tls/vault-ca.pem"
+ tls_min_version = "tls12"
+}
+
+# Storage configuration
+storage "raft" {
+  path    = "/opt/vault/data"
+  node_id = "vault-0"
+  retry_join {
+    leader_tls_servername = "{{ vault_fqdn }}"
+    leader_api_addr = "https://{{ vault_fqdn }}:8200"
+    leader_ca_cert_file = "/opt/vault/tls/vault-ca.pem"
+    leader_client_cert_file = "/opt/vault/tls/vault-cert.pem"
+    leader_client_key_file = "/opt/vault/tls/vault-key.pem"
+  }
+}
+EOF
+
+rm /etc/vault.d/vault.hcl
+~/.local/bin/j2 /tmp/vault.hcl.j2 -o /etc/vault.d/vault.hcl
+
+
 chown -R vault:vault /etc/vault.d/*
 chmod -R 640 /etc/vault.d/*
+
+# Enable vault service and start it
+systemctl enable vault
+systemctl start vault
